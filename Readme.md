@@ -2,8 +2,8 @@
 
 ## 1. Web socket end-point & message broker 구성
 ###  config/WebSocketConfig.class
-- @Configuration / Spring bean 설정
-- @EnableWebSocketMessageBroker / WebSocket 서버 활성화
+- `@Configuration` / Spring bean 설정
+- `@EnableWebSocketMessageBroker` / WebSocket 서버 활성화
 - registerStompEndpoints override method
     - 클라이언트가 웹 소켓 서버에 연결하는데 사용 할 웹 소켓 엔드포인트 등록
     - 엔드포인트 구성에 withSockJS() 사용
@@ -31,3 +31,22 @@
 ## 2. domain/vo 구성
 - enum class?
     - `Enumeration Type` 열거타입 이라고 하며 열거 타입에 들어가는 값들을 `Enumeration Constant` 열거 상수라고 한다.
+
+
+## 3. controller
+- `WebSocketConfig` 에서 `/app`으로 시작하는 대상이 있는 클라이언트에서 보낸 모든 메세지는 `@MessageMapping` 어노테이션이 달린 메서드로 라우팅
+    - ex) `/app/chat.sendMessage` 인 메세지는 `sendMessage()` 으로 라우팅
+    - ex) `/app/chat/addUser` 인 메세지는 `addUser()`으로 라우팅
+
+## 4. evnetlistenr
+- evnetlitner를 이용하여 소켓 연결, 소켓 끊기 이벤트 수신
+- 사용자가 채팅방을 참여, 떠날때 이벤트를 로깅하거나 broadcast 할 수 있음
+- `@Component` Spring bean 이라고 표시하는 역할. 이 어노테이션을 사용함으로써 Spring Component-scanning 기술이 해당 클래스를 어플맄이션의 컨텍스트에 빈으로 등록
+- `@EventListener` Spring 4.2 부터 이벤트 리스너가 ApllitcationListener 인터페이를 구현하는 Bean 일 필요가 없어졌음. 해당 어노테이션 주석을 통해 관리되는 Bean의 모든 public 메소드에 등록 할 수 있음.
+    - 해당 어노테이션은 Bean으로 등록된 Class의 메소드에서 사용 할 수 있음
+    - 해당 어노테이션이 적용되어 있는 메소드의 인수로 현재 `SessionConnectedEvent`와 `SessionDisconnectEvent`가 있음
+    - 해당 클래스의 상속관계를 거슬러 올라가다 보면 ApllicationEvent를 상속 받는 것을 확인 할 수 있음
+    - Spring 4.2 부터는 ApplicationEvent를 상속받지 않는 POJO클래스로도 이벤트로 사용 가능
+        - POJO(Plain Old Java Object)?
+            - 주로 특정 자바 모델이나 기능, 프레임워크를 따르지 않는 Java Object를 지칭
+    
